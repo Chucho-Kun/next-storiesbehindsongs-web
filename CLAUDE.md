@@ -29,5 +29,46 @@ B- Secciones:
 
 Footer: Se agregan secciones como "About Us", "Notice of Privacy", "Contact", y la lista de las Redes Sociales que te puedo proporcionar
 
-Finalmente un listo negro con el siguiente texto "storiesbehindsongs.com is a platform that publishes and stores information from different articles about popular songs, for the sole purpose of entertainment | 2026"
+Finalmente un liston negro con el siguiente texto "storiesbehindsongs.com is a platform that publishes and stores information from different articles about popular songs, for the sole purpose of entertainment | 2026"
+
+## Estado de implementación
+
+Este proyecto se está construyendo siguiendo specs versionadas en `specs/`. Este bloque se actualiza a medida que avanza el trabajo; refleja el estado real del código, no solo lo planeado.
+
+### SPEC 01 — Fundación Next.js, PostgreSQL y home completo
+
+**Estado: en progreso (18 de 19 pasos completados)**
+
+Completado:
+
+- Proyecto Next.js 16 (App Router, TypeScript, `src/`, alias `@/*`) + Tailwind CSS 4 + ESLint. `agentRules: false` y `trailingSlash: true` en `next.config.ts`.
+- Tokens de diseño en `src/app/globals.css`: fondo negro fijo (`--bg`), texto blanco (`--fg`), gris (`--muted`), rojo de títulos (`--title-red`, muestreado de `ficha.png`).
+- PostgreSQL en Railway conectado por `DATABASE_URL` en `.env.local`. Esquema Drizzle en `src/db/schema.ts` (`bands`, `stories`, `tags`, `storyTags`) migrado con `drizzle-kit`.
+- `scripts/parse-legacy-sql.ts`: parsea las 10 sentencias `INSERT` del dump legacy (`ejemplos/bd/stories.sql`) → 75 filas, 8 bandas.
+- `scripts/normalize-content.ts`: las 6 reglas de normalización de `texto`/`letra` a HTML limpio, con tests unitarios (`node --test`).
+- `scripts/seed.ts`: siembra idempotente por `legacyId` → 75 historias, 8 bandas, 51 tags, 0 historias sin tags.
+- `scripts/fetch-assets.ts`: descarga logos, portadas, imágenes de cuerpo y los 3 recursos de marca placeholder (`logo.svg`, `eye.svg`, `youtube-banner.webp`, reutilizados del sitio actual según la spec) → 472/472 descargas exitosas.
+- `src/db/queries.ts`: `getRecentStories`, `getPopularStories`, `getPopularTags`, `getBands`, `searchStories` (todas con `limit`/`offset`).
+- Componentes en `src/shared/`: `ui/StoryCard`, `layout/Header` (con buscador), `layout/Footer` (redes reales + franja legal), `sections/YoutubeBanner`, `sections/PopularTags`, `sections/PopularBands`, `sections/StoryGrid` (con paginación "VIEW MORE").
+- `src/app/page.tsx`: home con las 5 secciones en orden. `src/app/api/stories/route.ts` para la paginación.
+- `src/app/api/search/route.ts` + `src/app/search/page.tsx`: búsqueda por ILIKE (título, banda, álbum) con estado vacío.
+- Páginas placeholder de rutas del footer: `/about`, `/notice-of-privacy`, `/contact` (solo rutas y enlace, sin contenido real — así lo pide la spec).
+
+Pendiente:
+
+- **Paso 19**: conectar el buscador del header a `/search?q=` (el `<form>` ya apunta ahí, falta verificar el flujo end-to-end) y agregar los metadatos SEO del home (title, description, canonical, Open Graph, JSON-LD `WebSite` con `SearchAction`).
+- Verificar los criterios de aceptación completos de la spec (Lighthouse ≥90, build sin warnings, etc.) antes de marcarla como `Implementado`.
+- Commit y merge de la rama de trabajo a `main` (pendiente de tu autorización explícita).
+
+### Fuera de alcance de la SPEC 01 (para specs futuras)
+
+- Página de historia `/read/[band]/[song]/` con JSON-LD `BlogPosting` + `FAQPage` → **SPEC 02**.
+- Páginas `/bands/[band]/` y `/videos/[band]/` → **SPEC 02**.
+- Contenido real de About Us, Notice of Privacy y Contact (hoy son placeholders).
+- `sitemap.xml`, `robots.txt`, feed RSS → **SPEC 03**.
+- AdSense, GTM, Meta Pixel, Trustpilot, Google Translate.
+- Rutas en español (`/leer/`, `/banda/`).
+- Panel de administración (reemplazo de `/plataforma/`).
+- Despliegue del front y cambio de DNS del dominio.
+- Reemplazo de los 3 recursos de marca placeholder por los definitivos que tú proporciones.
 
