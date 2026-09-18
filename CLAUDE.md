@@ -37,7 +37,7 @@ Este proyecto se está construyendo siguiendo specs versionadas en `specs/`. Est
 
 ### SPEC 01 — Fundación Next.js, PostgreSQL y home completo
 
-**Estado: en progreso (18 de 19 pasos completados)**
+**Estado: Implementado (19 de 19 pasos completados, 17 de 17 criterios de aceptación verificados)**
 
 Completado:
 
@@ -53,12 +53,17 @@ Completado:
 - `src/app/page.tsx`: home con las 5 secciones en orden. `src/app/api/stories/route.ts` para la paginación.
 - `src/app/api/search/route.ts` + `src/app/search/page.tsx`: búsqueda por ILIKE (título, banda, álbum) con estado vacío.
 - Páginas placeholder de rutas del footer: `/about`, `/notice-of-privacy`, `/contact` (solo rutas y enlace, sin contenido real — así lo pide la spec).
+- **Paso 19**: buscador del header (`src/shared/layout/Header.tsx`) verificado end-to-end: `<form action="/search" method="GET">` → `src/app/search/page.tsx` (lee `q`, llama `searchStories`) → `StoryGrid` pagina siguientes resultados contra `/api/search/?q=...`. Metadatos SEO del home añadidos en `src/app/page.tsx`: `title`, `description`, `alternates.canonical`, Open Graph (con `youtube-banner.webp`) y JSON-LD `WebSite` con `potentialAction` `SearchAction` apuntando a `/search/?q={search_term_string}`.
+- Commit `1609f5b` en la rama `spec-01-fundacion-next-postgres-home`: 502 archivos (schema/queries/scripts, componentes de `src/shared/`, rutas API, páginas placeholder y todos los assets descargados en `public/`).
+
+Verificación final (17 de 17 criterios de `specs/01-fundacion-next-postgres-home.md` pasan):
+
+- Build de producción sin errores ni avisos de TypeScript; conteos 75/8/51 en BD; 0 filas con `::` o `=*` sin convertir; `legacyId` 77 → `polly`/`nirvana`; `friend-fake.webp` y los 389 `.webp` de `public/stories/` presentes; las cinco secciones del home en orden; Recent Articles 20→40 con VIEW MORE; Most Popular Songs encabezado por *We Are the World* (mayor `views`); búsqueda de «polly» con resultado y de «zzzz» con estado vacío; «Popular Tags» encabezado por *based on real events*; los 8 logos de bandas sirviendo desde `public/bands/`; texto 100% en inglés; línea legal del footer exacta.
+- Lighthouse en el home (modo escritorio, `npx lighthouse@12`): Performance 92, Accessibility 100, SEO 100.
 
 Pendiente:
 
-- **Paso 19**: conectar el buscador del header a `/search?q=` (el `<form>` ya apunta ahí, falta verificar el flujo end-to-end) y agregar los metadatos SEO del home (title, description, canonical, Open Graph, JSON-LD `WebSite` con `SearchAction`).
-- Verificar los criterios de aceptación completos de la spec (Lighthouse ≥90, build sin warnings, etc.) antes de marcarla como `Implementado`.
-- Commit y merge de la rama de trabajo a `main` (pendiente de tu autorización explícita).
+- Merge de la rama `spec-01-fundacion-next-postgres-home` a `main` (pendiente de tu autorización explícita).
 
 ### Fuera de alcance de la SPEC 01 (para specs futuras)
 

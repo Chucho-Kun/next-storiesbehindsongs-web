@@ -141,24 +141,26 @@ historias con contenido distinto y una carpeta común las machacaría.
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` termina sin errores ni avisos de TypeScript.
-- [ ] `SELECT count(*)` devuelve 75 en `stories`, 8 en `bands` y 51 en `tags`.
-- [ ] Ninguna fila de `stories` tiene `bodyHtml` con `::` o con `=*` sin convertir.
-- [ ] La historia con `legacyId` 77 tiene `slug = 'polly'` y su banda `slug = 'nirvana'`.
-- [ ] La ficha de esa historia enlaza exactamente a `/read/nirvana/polly/`.
-- [ ] `public/stories/nirvana/polly/friend-fake.webp` existe y pesa más de 0 bytes.
-- [ ] `public/stories/` contiene 389 archivos `.webp`.
-- [ ] El home muestra las cinco secciones en el orden del `CLAUDE.md`.
-- [ ] «Recent Articles» muestra 20 fichas y tras pulsar «VIEW MORE» muestra 40.
-- [ ] «Most Popular Songs» está ordenada por `views` descendente y su primera ficha es la de mayor
+- [x] `npm run build` termina sin errores ni avisos de TypeScript.
+- [x] `SELECT count(*)` devuelve 75 en `stories`, 8 en `bands` y 51 en `tags`.
+- [x] Ninguna fila de `stories` tiene `bodyHtml` con `::` o con `=*` sin convertir.
+- [x] La historia con `legacyId` 77 tiene `slug = 'polly'` y su banda `slug = 'nirvana'`.
+- [x] La ficha de esa historia enlaza exactamente a `/read/nirvana/polly/`.
+- [x] `public/stories/nirvana/polly/friend-fake.webp` existe y pesa más de 0 bytes.
+- [x] `public/stories/` contiene 389 archivos `.webp`.
+- [x] El home muestra las cinco secciones en el orden del `CLAUDE.md`.
+- [x] «Recent Articles» muestra 20 fichas y tras pulsar «VIEW MORE» muestra 40.
+- [x] «Most Popular Songs» está ordenada por `views` descendente y su primera ficha es la de mayor
       número de visitas.
-- [ ] Buscar «polly» en el header lleva a `/search?q=polly` y devuelve al menos un resultado.
-- [ ] Buscar «zzzz» muestra el estado vacío y no un error.
-- [ ] «Popular Tags» muestra «based on real events» en primer lugar (14 apariciones).
-- [ ] «Bands More Popular» muestra los 8 logos servidos desde `public/bands/`.
-- [ ] Todo el texto visible del front está en inglés.
-- [ ] El footer termina con la línea legal exacta del `CLAUDE.md`.
-- [ ] Lighthouse en el home da 90 o más en Performance, Accessibility y SEO en modo escritorio.
+- [x] Buscar «polly» en el header lleva a `/search?q=polly` y devuelve al menos un resultado.
+- [x] Buscar «zzzz» muestra el estado vacío y no un error.
+- [x] «Popular Tags» muestra «based on real events» en primer lugar (14 apariciones).
+- [x] «Bands More Popular» muestra los 8 logos servidos desde `public/bands/`.
+- [x] Todo el texto visible del front está en inglés.
+- [x] El footer termina con la línea legal exacta del `CLAUDE.md`.
+- [x] Lighthouse en el home da 90 o más en Performance, Accessibility y SEO en modo escritorio.
+      (Performance 92, Accessibility 100, SEO 100 — medido en local contra la `DATABASE_URL`
+      pública de Railway; en producción el TTFB debería mejorar aún más con la URL interna.)
 
 ## Decisiones
 
