@@ -1,4 +1,4 @@
-import { desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "./index";
 import { bands, stories, storyTags, tags } from "./schema";
 
@@ -11,6 +11,23 @@ export type StoryCard = {
   coverPath: string;
   views: number;
   band: { slug: string; name: string; logoPath: string };
+};
+
+export type StoryDetail = {
+  id: number;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  album: string;
+  youtubeId: string;
+  bodyHtml: string;
+  lyrics: string | null;
+  faqs: { author: string; meaning: string; facts: string; lyrics: string } | null;
+  coverPath: string;
+  views: number;
+  publishedAt: Date;
+  band: { slug: string; name: string; logoPath: string };
+  tags: { slug: string; name: string }[];
 };
 
 export type PopularTag = { slug: string; name: string; count: number };
@@ -66,11 +83,16 @@ export async function getRecentStories(limit: number, offset = 0): Promise<Story
   return rows.map(toStoryCard);
 }
 
-export async function getPopularStories(limit: number, offset = 0): Promise<StoryCard[]> {
+export async function getPopularStories(
+  limit: number,
+  offset = 0,
+  excludeId?: number,
+): Promise<StoryCard[]> {
   const rows = await db
     .select(storyCardColumns)
     .from(stories)
     .innerJoin(bands, eq(stories.bandId, bands.id))
+    .where(excludeId === undefined ? undefined : ne(stories.id, excludeId))
     .orderBy(desc(stories.views))
     .limit(limit)
     .offset(offset);
@@ -125,4 +147,76 @@ export async function searchStories(
     .offset(offset);
 
   return rows.map(toStoryCard);
+}
+
+export async function getStoryBySlugs(
+  bandSlug: string,
+  storySlug: string,
+): Promise<StoryDetail | null> {
+  const [row] = await db
+    .select({
+      id: stories.id,
+      slug: stories.slug,
+      title: stories.title,
+      subtitle: stories.subtitle,
+      album: stories.album,
+      youtubeId: stories.youtubeId,
+      bodyHtml: stories.bodyHtml,
+      lyrics: stories.lyrics,
+      faqs: stories.faqs,
+      coverPath: stories.coverPath,
+      views: stories.views,
+      publishedAt: stories.publishedAt,
+      bandSlug: bands.slug,
+      bandName: bands.name,
+      bandLogoPath: bands.logoPath,
+    })
+    .from(stories)
+    .innerJoin(bands, eq(stories.bandId, bands.id))
+    .where(and(eq(bands.slug, bandSlug), eq(stories.slug, storySlug)))
+    .limit(1);
+
+  if (!row) return null;
+
+  const storyTagRows = await db
+    .select({ slug: tags.slug, name: tags.name })
+    .from(storyTags)
+    .innerJoin(tags, eq(storyTags.tagId, tags.id))
+    .where(eq(storyTags.storyId, row.id))
+    .orderBy(tags.name);
+
+  const { bandSlug: bSlug, bandName, bandLogoPath, ...story } = row;
+  return {
+    ...story,
+    band: { slug: bSlug, name: bandName, logoPath: bandLogoPath },
+    tags: storyTagRows,
+  };
+}
+
+export async function getRelatedStories(
+  storyId: number,
+  tagSlugs: string[],
+  limit: number,
+): Promise<StoryCard[]> {
+  if (tagSlugs.length === 0) return [];
+
+  const rows = await db
+    .select(storyCardColumns)
+    .from(stories)
+    .innerJoin(bands, eq(stories.bandId, bands.id))
+    .innerJoin(storyTags, eq(storyTags.storyId, stories.id))
+    .innerJoin(tags, eq(storyTags.tagId, tags.id))
+    .where(and(ne(stories.id, storyId), inArray(tags.slug, tagSlugs)))
+    .groupBy(stories.id, bands.id)
+    .orderBy(desc(sql`count(${tags.id})`), desc(stories.views))
+    .limit(limit);
+
+  return rows.map(toStoryCard);
+}
+
+export async function getAllStorySlugs(): Promise<{ band: string; song: string }[]> {
+  return db
+    .select({ band: bands.slug, song: stories.slug })
+    .from(stories)
+    .innerJoin(bands, eq(stories.bandId, bands.id));
 }

@@ -5,6 +5,9 @@ import { normalizeBodyHtml, normalizeLyrics } from "./normalize-content";
 import { parseLegacySql, type LegacyStoryRow } from "./parse-legacy-sql";
 import { slugify, splitTitle } from "./slug";
 
+/** The legacy dump has no per-story date, so new stories share the migration date. */
+const seedRunAt = new Date();
+
 type Faqs = { author: string; meaning: string; facts: string; lyrics: string };
 
 function parseFaqs(raw: string): Faqs {
@@ -68,7 +71,11 @@ async function upsertStory(row: LegacyStoryRow, bandId: number, bandSlug: string
     return story;
   }
 
-  const [story] = await db.insert(stories).values(values).returning();
+  // `publishedAt` is only set on first insert so re-seeding never overwrites it.
+  const [story] = await db
+    .insert(stories)
+    .values({ ...values, publishedAt: seedRunAt })
+    .returning();
   return story;
 }
 

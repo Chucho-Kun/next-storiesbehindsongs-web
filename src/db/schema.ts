@@ -6,6 +6,7 @@ import {
   primaryKey,
   serial,
   text,
+  timestamp,
   unique,
   varchar,
 } from "drizzle-orm/pg-core";
@@ -46,6 +47,9 @@ export const stories = pgTable(
     }>(),
     coverPath: text("cover_path").notNull(),
     views: integer("views").notNull().default(0),
+    publishedAt: timestamp("published_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
   },
   (table) => [
     unique("stories_band_slug_unique").on(table.bandId, table.slug),

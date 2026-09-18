@@ -1,0 +1,1 @@
+ALTER TABLE "stories" ADD COLUMN "published_at" timestamp with time zone DEFAULT now() NOT NULL;

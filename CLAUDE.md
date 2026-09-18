@@ -65,10 +65,36 @@ Pendiente:
 
 - Merge de la rama `spec-01-fundacion-next-postgres-home` a `main` (pendiente de tu autorización explícita).
 
-### Fuera de alcance de la SPEC 01 (para specs futuras)
+### SPEC 02 — Página de historia `/read/[band]/[song]/`
 
-- Página de historia `/read/[band]/[song]/` con JSON-LD `BlogPosting` + `FAQPage` → **SPEC 02**.
-- Páginas `/bands/[band]/` y `/videos/[band]/` → **SPEC 02**.
+**Estado: Implementado (14 de 14 pasos completados, 18 de 18 criterios de aceptación verificados)**
+
+Completado:
+
+- `stories.publishedAt` (`timestamptz`, `NOT NULL DEFAULT now()`) con migración `drizzle/0001_add_published_at.sql`. `scripts/seed.ts` la fija solo en el insert inicial (idempotente); las 75 historias comparten la fecha de migración (2026-09-18).
+- `src/db/queries.ts`: `getStoryBySlugs`, `getRelatedStories`, `getAllStorySlugs` y `excludeId` opcional en `getPopularStories`. Tipo `StoryDetail`.
+- `src/app/read/[band]/[song]/page.tsx`: pre-renderizada estática (75 páginas con `generateStaticParams`), `notFound()` para slugs inexistentes, `generateMetadata` y los 3 JSON-LD. Fondo `#efefef` solo dentro de esta ruta; Header y Footer negros no cambian.
+- Orden de la página: Breadcrumb → StoryHero (título, banda, subtítulo, fecha, vistas, logo + álbum, iframe de YouTube, tags) → YoutubeBanner → StoryBody → StoryLyrics (`#lyrics`) → StoryFaq → MostPopularStories → RelatedSongs.
+- Componentes nuevos en `src/shared/`: `ui/Breadcrumb`, `ui/StoryCardGrid`, `sections/StoryHero`, `StoryBody`, `StoryLyrics`, `StoryFaq` (exporta `buildFaqEntries`), `MostPopularStories`, `RelatedSongs`.
+- `src/lib/story-seo.ts`: metadatos (title `{Song} by {Band}`, canonical, Open Graph `article`) y JSON-LD `BreadcrumbList`, `BlogPosting` y `FAQPage` (la 4.ª respuesta usa `stories.lyrics` normalizado, no `faqs.lyrics`).
+- Decisiones: `dateModified` = `datePublished` (no hay fecha de modificación); `description` sale de `subtitle` (≤160 caracteres) o `faqs.meaning`; sin pestaña «TRANSLATED»; `views` no se incrementa por visita.
+
+Verificación final (18 de 18 criterios de `specs/02-pagina-historia-read.md` pasan):
+
+- Build sin errores ni avisos de TypeScript, 75 páginas SSG; `/read/nirvana/polly/` responde 200 con título, banda, álbum y subtítulo correctos; fecha igual a `publishedAt`; 30 vistas estáticas tras 3 recargas; `friend-fake.webp` en el cuerpo; 6 estrofas de letra; FAQ con las 4 preguntas; 4 tags sin enlace; «Most Popular Stories» (8) y «Related Songs» (8) sin Polly ni duplicados; logo y nombre enlazan a `/bands/nirvana/`; slugs inexistentes → 404; texto 100% en inglés.
+- Lighthouse en `/read/nirvana/polly/` (escritorio, `npx lighthouse@12`): tres corridas con Performance 99, Accessibility 100, SEO 100. Una primera corrida dio Performance 87 (Speed Index 3.4 s), atribuida a ruido.
+
+Pendiente:
+
+- Decidir la incoherencia entre el orden Letra → FAQ y el texto «See the full lyrics below ↓» (ver «Notas de implementación» de la spec).
+- Confirmar el JSON-LD con el validador de schema.org (no se pasó) y comparar visualmente contra el sitio original.
+- Commit de la SPEC 02 y merge de las ramas `spec-01-fundacion-next-postgres-home` y `spec-02-pagina-historia-read` a `main` (pendiente de tu autorización explícita; la rama 02 sale de la 01).
+
+### Fuera de alcance de las SPEC 01 y 02 (para specs futuras)
+
+- Páginas `/bands/[band]/` y `/videos/[band]/` (hoy el logo y el breadcrumb de la historia enlazan a `/bands/{band}/` y dan 404) → spec futura.
+- Página de filtrado por tag `/tags/[tag]/` (las pills de tags no llevan a ningún sitio), widget de información de banda (país, bandera), botones «VIEW ONLY VIDEO» / «SHORT VIDEO» y pestaña de letra traducida.
+- Compartir en redes (ShareThis) e incremento de `views` por visita.
 - Contenido real de About Us, Notice of Privacy y Contact (hoy son placeholders).
 - `sitemap.xml`, `robots.txt`, feed RSS → **SPEC 03**.
 - AdSense, GTM, Meta Pixel, Trustpilot, Google Translate.

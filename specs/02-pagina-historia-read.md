@@ -1,6 +1,6 @@
 # SPEC 02 — Página de historia `/read/[band]/[song]/`
 
-> **Estado:** Approved
+> **Estado:** Implemented
 > **Depende de:** SPEC 01
 > **Fecha:** 2026-09-18
 > **Objetivo:** Construir la página `/read/{band}/{song}/`, alimentada 100% desde PostgreSQL, que
@@ -140,33 +140,33 @@ guarda en la base — igual que hace el sitio actual):
 
 ## Criterios de aceptación
 
-- [ ] `npm run build` termina sin errores ni avisos de TypeScript, con las 75 páginas de
+- [x] `npm run build` termina sin errores ni avisos de TypeScript, con las 75 páginas de
       `/read/[band]/[song]/` pre-renderizadas como estáticas.
-- [ ] `/read/nirvana/polly/` responde 200 y muestra título «Polly», banda «Nirvana», álbum
+- [x] `/read/nirvana/polly/` responde 200 y muestra título «Polly», banda «Nirvana», álbum
       «Nevermind (1991)» y el subtítulo exacto de la migración.
-- [ ] La fecha mostrada bajo el título coincide con `stories.publishedAt` de esa fila.
-- [ ] Las vistas mostradas son el valor estático (30) y no cambian tras recargar la página 3 veces.
-- [ ] El cuerpo renderiza `bodyHtml`, incluida la imagen `friend-fake.webp` servida desde
+- [x] La fecha mostrada bajo el título coincide con `stories.publishedAt` de esa fila.
+- [x] Las vistas mostradas son el valor estático (30) y no cambian tras recargar la página 3 veces.
+- [x] El cuerpo renderiza `bodyHtml`, incluida la imagen `friend-fake.webp` servida desde
       `/stories/nirvana/polly/friend-fake.webp`.
-- [ ] La sección de letra (`id="lyrics"`) muestra `stories.lyrics` con saltos de línea y estrofas
+- [x] La sección de letra (`id="lyrics"`) muestra `stories.lyrics` con saltos de línea y estrofas
       separadas, sin pestaña «TRANSLATED».
-- [ ] El FAQ visible muestra las 4 preguntas: «Who wrote Polly?» (Kurt Cobain), «Nirvana Polly
+- [x] El FAQ visible muestra las 4 preguntas: «Who wrote Polly?» (Kurt Cobain), «Nirvana Polly
       meaning», «Curious facts on Polly», y «Nirvana Polly lyrics» con la respuesta «See the full
       lyrics below ↓» enlazando a `#lyrics`.
-- [ ] Los tags de la historia se muestran como pills sin enlace.
-- [ ] «Most Popular Stories» muestra 8 fichas por `views` descendente, sin incluir a Polly.
-- [ ] «Related Songs» muestra hasta 8 fichas que comparten al menos un tag con Polly, sin incluirla
+- [x] Los tags de la historia se muestran como pills sin enlace.
+- [x] «Most Popular Stories» muestra 8 fichas por `views` descendente, sin incluir a Polly.
+- [x] «Related Songs» muestra hasta 8 fichas que comparten al menos un tag con Polly, sin incluirla
       ni duplicados.
-- [ ] El logo de banda y el nombre de banda enlazan a `/bands/nirvana/`.
-- [ ] El JSON-LD `BreadcrumbList` tiene 3 niveles (Home, Nirvana, Polly) y valida sin errores.
-- [ ] El JSON-LD `BlogPosting` incluye `headline`, `description`, `image`, `datePublished` y
+- [x] El logo de banda y el nombre de banda enlazan a `/bands/nirvana/`.
+- [x] El JSON-LD `BreadcrumbList` tiene 3 niveles (Home, Nirvana, Polly) y valida sin errores.
+- [x] El JSON-LD `BlogPosting` incluye `headline`, `description`, `image`, `datePublished` y
       `dateModified` coincidiendo con los datos de la historia.
-- [ ] El JSON-LD `FAQPage` tiene 4 preguntas; la última usa el texto normalizado de `stories.lyrics`
+- [x] El JSON-LD `FAQPage` tiene 4 preguntas; la última usa el texto normalizado de `stories.lyrics`
       como respuesta, no el `faqs.lyrics` crudo.
-- [ ] `/read/nirvana/cancion-inexistente/` devuelve 404.
-- [ ] `/read/banda-inexistente/polly/` devuelve 404.
-- [ ] Todo el texto visible de la página está en inglés.
-- [ ] Lighthouse en `/read/nirvana/polly/` da 90 o más en Performance, Accessibility y SEO en modo
+- [x] `/read/nirvana/cancion-inexistente/` devuelve 404.
+- [x] `/read/banda-inexistente/polly/` devuelve 404.
+- [x] Todo el texto visible de la página está en inglés.
+- [x] Lighthouse en `/read/nirvana/polly/` da 90 o más en Performance, Accessibility y SEO en modo
       escritorio.
 
 ## Decisiones
@@ -227,3 +227,26 @@ guarda en la base — igual que hace el sitio actual):
 - Incrementar el contador de vistas.
 
 Cada uno, si llega, va en su propia spec.
+
+## Notas de implementación
+
+Desviaciones y observaciones surgidas al implementar. Ninguna cambió el alcance.
+
+- **Tags de Polly:** la spec (Paso 3) dice 3 tags, pero en la base tiene 4 (`based on real events`,
+  `controversial lyrics`, `curious fact`, `dark song`). Es un dato del seed; el código no depende de él.
+- **«Fila 77»:** es el `legacyId` de Polly. Su `id` real en la base es 75.
+- **Orden Letra → FAQ vs. «See the full lyrics below ↓»:** el Paso 12 pone la letra *antes* del FAQ,
+  pero el texto exacto del criterio dice «below». Se implementó tal cual la spec; queda como
+  incoherencia abierta (opciones: FAQ → Letra, o «above ↑»).
+- **Helpers añadidos, no listados en el plan:** `getAllStorySlugs()` en `src/db/queries.ts` (necesaria
+  para `generateStaticParams`), `src/shared/ui/StoryCardGrid.tsx` (rejilla compartida por
+  «Most Popular Stories» y «Related Songs») y `src/lib/story-seo.ts` (constructores de metadatos y
+  JSON-LD; escapa `<` al serializar).
+- **`dateModified`:** no hay fecha de modificación en la base, así que es igual a `datePublished`.
+- **`description` SEO:** sale de `subtitle` (recortado a 160 caracteres) y, si falta, de `faqs.meaning`.
+- **Encabezados:** la letra usa «Lyrics» y el FAQ «FAQ»; la spec no fijaba el texto.
+- **Lighthouse** (`/read/nirvana/polly/`, escritorio, `npx lighthouse@12`): una primera corrida dio
+  Performance 87 (Speed Index 3.4 s, atribuido a ruido); tres corridas posteriores dieron
+  Performance 99, Accessibility 100, SEO 100.
+- **No verificado:** el JSON-LD se comprobó por estructura y campos, no con el validador externo de
+  schema.org; tampoco se comparó visualmente contra el sitio original.
