@@ -13,7 +13,7 @@ export function truncate(text: string, max: number): string {
   return `${text.slice(0, max).replace(/\s+\S*$/, "")}…`;
 }
 
-function storyDescription(story: StoryDetail): string {
+export function storyDescription(story: StoryDetail): string {
   const text = story.subtitle ?? story.faqs?.meaning ?? `The story behind ${story.title} by ${story.band.name}.`;
   return truncate(text, 160);
 }

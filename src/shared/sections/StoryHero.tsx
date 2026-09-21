@@ -1,7 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { StoryDetail } from "@/db/queries";
+import { videoPath } from "@/lib/video-seo";
+import { LinkButton } from "@/shared/ui/LinkButton";
 import { TagPill } from "@/shared/ui/TagPill";
+import { VideoEmbed } from "@/shared/ui/VideoEmbed";
 
 const publishedFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -48,15 +51,14 @@ export function StoryHero({ story }: { story: StoryDetail }) {
         </div>
       </div>
 
-      <div className="relative aspect-video w-full bg-black">
-        <iframe
-          src={`https://www.youtube.com/embed/${story.youtubeId}`}
-          title={`${story.title} by ${story.band.name}`}
-          loading="lazy"
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="absolute inset-0 h-full w-full border-0"
-        />
+      <VideoEmbed
+        youtubeId={story.youtubeId}
+        title={`${story.title} by ${story.band.name}`}
+        loading="lazy"
+      />
+
+      <div>
+        <LinkButton href={videoPath(story)}>View Only Video</LinkButton>
       </div>
 
       {story.tags.length > 0 && (
