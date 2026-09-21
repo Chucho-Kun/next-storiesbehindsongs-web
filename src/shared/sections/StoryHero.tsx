@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { StoryDetail } from "@/db/queries";
+import { TagPill } from "@/shared/ui/TagPill";
 
 const publishedFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
@@ -61,11 +62,8 @@ export function StoryHero({ story }: { story: StoryDetail }) {
       {story.tags.length > 0 && (
         <ul className="flex flex-wrap gap-2">
           {story.tags.map((tag) => (
-            <li
-              key={tag.slug}
-              className="rounded-full border border-neutral-400 px-3 py-1 text-sm text-neutral-800"
-            >
-              {tag.name}
+            <li key={tag.slug}>
+              <TagPill tag={tag} variant="light" />
             </li>
           ))}
         </ul>

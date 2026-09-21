@@ -9,6 +9,7 @@ export async function GET(request: NextRequest) {
   const section = searchParams.get("section");
   const offset = Number(searchParams.get("offset") ?? "0");
   const band = searchParams.get("band") ?? undefined;
+  const tag = searchParams.get("tag") ?? undefined;
 
   if (section !== "recent" && section !== "popular") {
     return NextResponse.json({ error: "Invalid section" }, { status: 400 });
@@ -19,11 +20,14 @@ export async function GET(request: NextRequest) {
   if (band !== undefined && (band.length > 255 || !SLUG_PATTERN.test(band))) {
     return NextResponse.json({ error: "Invalid band" }, { status: 400 });
   }
+  if (tag !== undefined && (tag.length > 255 || !SLUG_PATTERN.test(tag))) {
+    return NextResponse.json({ error: "Invalid tag" }, { status: 400 });
+  }
 
   const stories =
     section === "recent"
-      ? await getRecentStories(PAGE_SIZE, offset, band)
-      : await getPopularStories(PAGE_SIZE, offset, undefined, band);
+      ? await getRecentStories(PAGE_SIZE, offset, band, tag)
+      : await getPopularStories(PAGE_SIZE, offset, undefined, band, tag);
 
   return NextResponse.json({ stories });
 }

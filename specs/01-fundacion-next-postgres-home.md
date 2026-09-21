@@ -1,6 +1,6 @@
 # SPEC 01 — Fundación Next.js, PostgreSQL en Railway y home completo
 
-> **Estado:** Aprobado
+> **Estado:** Implemented
 > **Depende de:** —
 > **Fecha:** 2026-09-17
 > **Objetivo:** Levantar el proyecto Next.js 16 con Tailwind 4, migrar las 75 historias de

@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 import { db } from "./index";
 import { albums, bands, stories, storyTags, tags } from "./schema";
 
@@ -52,6 +53,10 @@ export type BandAlbum = {
 
 export type PopularTag = { slug: string; name: string; count: number };
 
+export type TagDetail = { id: number; slug: string; name: string; storyCount: number };
+
+export type RelatedTag = { slug: string; name: string; sharedCount: number };
+
 export type BandSummary = { slug: string; name: string; logoPath: string; storyCount: number };
 
 const storyCardColumns = {
@@ -91,16 +96,28 @@ function toStoryCard(row: {
   };
 }
 
+function tagFilter(tagSlug: string | undefined) {
+  if (tagSlug === undefined) return undefined;
+  return sql`exists (
+    select 1 from ${storyTags}
+    inner join ${tags} on ${tags.id} = ${storyTags.tagId}
+    where ${storyTags.storyId} = ${stories.id} and ${tags.slug} = ${tagSlug}
+  )`;
+}
+
 export async function getRecentStories(
   limit: number,
   offset = 0,
   bandSlug?: string,
+  tagSlug?: string,
 ): Promise<StoryCard[]> {
   const rows = await db
     .select(storyCardColumns)
     .from(stories)
     .innerJoin(bands, eq(stories.bandId, bands.id))
-    .where(bandSlug === undefined ? undefined : eq(bands.slug, bandSlug))
+    .where(
+      and(bandSlug === undefined ? undefined : eq(bands.slug, bandSlug), tagFilter(tagSlug)),
+    )
     .orderBy(desc(stories.id))
     .limit(limit)
     .offset(offset);
@@ -113,6 +130,7 @@ export async function getPopularStories(
   offset = 0,
   excludeId?: number,
   bandSlug?: string,
+  tagSlug?: string,
 ): Promise<StoryCard[]> {
   const rows = await db
     .select(storyCardColumns)
@@ -122,6 +140,7 @@ export async function getPopularStories(
       and(
         excludeId === undefined ? undefined : ne(stories.id, excludeId),
         bandSlug === undefined ? undefined : eq(bands.slug, bandSlug),
+        tagFilter(tagSlug),
       ),
     )
     .orderBy(desc(stories.views))
@@ -144,6 +163,67 @@ export async function getPopularTags(limit: number, offset = 0): Promise<Popular
     .orderBy(desc(sql`count(${storyTags.storyId})`))
     .limit(limit)
     .offset(offset);
+}
+
+export async function getTagBySlug(slug: string): Promise<TagDetail | null> {
+  const [tag] = await db
+    .select({
+      id: tags.id,
+      slug: tags.slug,
+      name: tags.name,
+      storyCount: sql<number>`count(${storyTags.storyId})::int`,
+    })
+    .from(tags)
+    .leftJoin(storyTags, eq(storyTags.tagId, tags.id))
+    .where(eq(tags.slug, slug))
+    .groupBy(tags.id)
+    .limit(1);
+
+  return tag ?? null;
+}
+
+export async function getAllTagSlugs(): Promise<string[]> {
+  const rows = await db
+    .selectDistinct({ slug: tags.slug })
+    .from(tags)
+    .innerJoin(storyTags, eq(storyTags.tagId, tags.id));
+  return rows.map((row) => row.slug);
+}
+
+export async function getAllTags(): Promise<PopularTag[]> {
+  return db
+    .select({
+      slug: tags.slug,
+      name: tags.name,
+      count: sql<number>`count(${storyTags.storyId})::int`,
+    })
+    .from(tags)
+    .innerJoin(storyTags, eq(storyTags.tagId, tags.id))
+    .groupBy(tags.id)
+    .orderBy(desc(sql`count(${storyTags.storyId})`), asc(tags.name));
+}
+
+export async function getRelatedTags(tagSlug: string, limit: number): Promise<RelatedTag[]> {
+  const current = alias(storyTags, "current_story_tags");
+  const currentTag = alias(tags, "current_tag");
+
+  return db
+    .select({
+      slug: tags.slug,
+      name: tags.name,
+      sharedCount: sql<number>`count(${storyTags.storyId})::int`,
+    })
+    .from(currentTag)
+    .innerJoin(current, eq(current.tagId, currentTag.id))
+    .innerJoin(
+      storyTags,
+      and(eq(storyTags.storyId, current.storyId), ne(storyTags.tagId, currentTag.id)),
+    )
+    .innerJoin(tags, eq(tags.id, storyTags.tagId))
+    .where(eq(currentTag.slug, tagSlug))
+    .groupBy(tags.id)
+    .orderBy(desc(sql`count(${storyTags.storyId})`), asc(tags.name))
+    .limit(limit);
 }
 
 export async function getBands(limit: number, offset = 0): Promise<BandSummary[]> {
