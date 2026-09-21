@@ -1,6 +1,6 @@
-import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { db } from "./index";
-import { bands, stories, storyTags, tags } from "./schema";
+import { albums, bands, stories, storyTags, tags } from "./schema";
 
 export type StoryCard = {
   id: number;
@@ -28,6 +28,26 @@ export type StoryDetail = {
   publishedAt: Date;
   band: { slug: string; name: string; logoPath: string };
   tags: { slug: string; name: string }[];
+};
+
+export type BandDetail = {
+  id: number;
+  slug: string;
+  name: string;
+  logoPath: string;
+  location: string;
+  countryCode: string;
+  founded: string;
+  genre: string;
+  description: string;
+};
+
+export type BandAlbum = {
+  id: number;
+  name: string;
+  releaseDate: string;
+  coverPath: string;
+  url: string;
 };
 
 export type PopularTag = { slug: string; name: string; count: number };
@@ -71,11 +91,16 @@ function toStoryCard(row: {
   };
 }
 
-export async function getRecentStories(limit: number, offset = 0): Promise<StoryCard[]> {
+export async function getRecentStories(
+  limit: number,
+  offset = 0,
+  bandSlug?: string,
+): Promise<StoryCard[]> {
   const rows = await db
     .select(storyCardColumns)
     .from(stories)
     .innerJoin(bands, eq(stories.bandId, bands.id))
+    .where(bandSlug === undefined ? undefined : eq(bands.slug, bandSlug))
     .orderBy(desc(stories.id))
     .limit(limit)
     .offset(offset);
@@ -87,12 +112,18 @@ export async function getPopularStories(
   limit: number,
   offset = 0,
   excludeId?: number,
+  bandSlug?: string,
 ): Promise<StoryCard[]> {
   const rows = await db
     .select(storyCardColumns)
     .from(stories)
     .innerJoin(bands, eq(stories.bandId, bands.id))
-    .where(excludeId === undefined ? undefined : ne(stories.id, excludeId))
+    .where(
+      and(
+        excludeId === undefined ? undefined : ne(stories.id, excludeId),
+        bandSlug === undefined ? undefined : eq(bands.slug, bandSlug),
+      ),
+    )
     .orderBy(desc(stories.views))
     .limit(limit)
     .offset(offset);
@@ -219,4 +250,43 @@ export async function getAllStorySlugs(): Promise<{ band: string; song: string }
     .select({ band: bands.slug, song: stories.slug })
     .from(stories)
     .innerJoin(bands, eq(stories.bandId, bands.id));
+}
+
+export async function getBandBySlug(slug: string): Promise<BandDetail | null> {
+  const [band] = await db
+    .select({
+      id: bands.id,
+      slug: bands.slug,
+      name: bands.name,
+      logoPath: bands.logoPath,
+      location: bands.location,
+      countryCode: bands.countryCode,
+      founded: bands.founded,
+      genre: bands.genre,
+      description: bands.description,
+    })
+    .from(bands)
+    .where(eq(bands.slug, slug))
+    .limit(1);
+
+  return band ?? null;
+}
+
+export async function getAlbumsByBand(bandId: number): Promise<BandAlbum[]> {
+  return db
+    .select({
+      id: albums.id,
+      name: albums.name,
+      releaseDate: albums.releaseDate,
+      coverPath: albums.coverPath,
+      url: albums.url,
+    })
+    .from(albums)
+    .where(eq(albums.bandId, bandId))
+    .orderBy(asc(albums.releaseDate), asc(albums.id));
+}
+
+export async function getAllBandSlugs(): Promise<string[]> {
+  const rows = await db.select({ slug: bands.slug }).from(bands);
+  return rows.map((row) => row.slug);
 }

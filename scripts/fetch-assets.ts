@@ -1,5 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { db } from "../src/db";
+import { bands } from "../src/db/schema";
 import { parseLegacySql } from "./parse-legacy-sql";
 import { slugify, splitTitle } from "./slug";
 
@@ -106,15 +108,29 @@ function buildTasks() {
   return { logoTasks, coverTasks, bodyImageTasks };
 }
 
+/** One SVG flag per distinct `bands.countryCode`. Album covers are not
+ * downloaded: they are hotlinked YouTube thumbnails (see fetch-band-data.ts). */
+async function buildFlagTasks(): Promise<DownloadTask[]> {
+  const rows = await db.selectDistinct({ countryCode: bands.countryCode }).from(bands);
+  return rows
+    .map((row) => row.countryCode)
+    .filter((code) => code.length > 0)
+    .map((code) => ({
+      url: `https://flagcdn.com/${code}.svg`,
+      dest: join(PUBLIC_DIR, "flags", `${code}.svg`),
+    }));
+}
+
 async function main() {
   const { logoTasks, coverTasks, bodyImageTasks } = buildTasks();
-  const allTasks = [...brandTasks, ...logoTasks, ...coverTasks, ...bodyImageTasks];
+  const flagTasks = await buildFlagTasks();
+  const allTasks = [...brandTasks, ...logoTasks, ...coverTasks, ...bodyImageTasks, ...flagTasks];
 
   const failures = await downloadAll(allTasks);
   const redirects = failures.filter((f) => f.status !== undefined && f.status >= 300 && f.status < 400);
 
   console.log(
-    `${brandTasks.length} recursos de marca, ${logoTasks.length} logos, ${coverTasks.length} portadas, ${bodyImageTasks.length} imágenes de cuerpo`,
+    `${brandTasks.length} recursos de marca, ${logoTasks.length} logos, ${coverTasks.length} portadas, ${bodyImageTasks.length} imágenes de cuerpo, ${flagTasks.length} banderas`,
   );
   console.log(`${allTasks.length - failures.length} descargas exitosas de ${allTasks.length}`);
   console.log(`${failures.length} fallos, ${redirects.length} de ellos con status 3xx`);

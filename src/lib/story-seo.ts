@@ -8,7 +8,7 @@ export function storyPath(story: Pick<StoryDetail, "slug" | "band">): string {
   return `/read/${story.band.slug}/${story.slug}/`;
 }
 
-function truncate(text: string, max: number): string {
+export function truncate(text: string, max: number): string {
   if (text.length <= max) return text;
   return `${text.slice(0, max).replace(/\s+\S*$/, "")}…`;
 }

@@ -1,4 +1,5 @@
 import {
+  date,
   index,
   integer,
   jsonb,
@@ -18,8 +19,32 @@ export const bands = pgTable(
     slug: varchar("slug", { length: 255 }).notNull(),
     name: varchar("name", { length: 255 }).notNull(),
     logoPath: text("logo_path").notNull(),
+    location: text("location").notNull().default(""),
+    countryCode: varchar("country_code", { length: 2 }).notNull().default(""),
+    founded: varchar("founded", { length: 16 }).notNull().default(""),
+    genre: varchar("genre", { length: 64 }).notNull().default(""),
+    description: text("description").notNull().default(""),
   },
   (table) => [unique("bands_slug_unique").on(table.slug)],
+);
+
+export const albums = pgTable(
+  "albums",
+  {
+    id: serial("id").primaryKey(),
+    legacyId: integer("legacy_id").notNull(),
+    bandId: integer("band_id")
+      .notNull()
+      .references(() => bands.id),
+    name: varchar("name", { length: 255 }).notNull(),
+    releaseDate: date("release_date").notNull(),
+    coverPath: text("cover_path").notNull(),
+    url: text("url").notNull(),
+  },
+  (table) => [
+    unique("albums_legacy_id_unique").on(table.legacyId),
+    index("albums_band_id_idx").on(table.bandId),
+  ],
 );
 
 export const stories = pgTable(

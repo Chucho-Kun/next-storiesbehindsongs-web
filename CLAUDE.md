@@ -90,13 +90,34 @@ Pendiente:
 - Confirmar el JSON-LD con el validador de schema.org (no se pasó) y comparar visualmente contra el sitio original.
 - Commit de la SPEC 02 y merge de las ramas `spec-01-fundacion-next-postgres-home` y `spec-02-pagina-historia-read` a `main` (pendiente de tu autorización explícita; la rama 02 sale de la 01).
 
-### Fuera de alcance de las SPEC 01 y 02 (para specs futuras)
+### SPEC 03 — Página de banda `/bands/[band]/`
 
-- Páginas `/bands/[band]/` y `/videos/[band]/` (hoy el logo y el breadcrumb de la historia enlazan a `/bands/{band}/` y dan 404) → spec futura.
+**Estado: Implementado (11 de 11 pasos completados, 14 de 15 criterios de aceptación verificados; 1 parcial)**
+
+Completado:
+
+- `bands` con `location`, `countryCode`, `founded`, `genre`, `description` y tabla `albums` (migración `drizzle/0002_add_band_profile_and_albums.sql`).
+- `scripts/fetch-band-data.ts`: siembra idempotente desde la API del sitio actual (país traducido a inglés con mapa fijo; 8 bandas, 32 álbumes; no pisa `albums.url`). `scripts/fetch-assets.ts` descarga las banderas a `public/flags/`.
+- `src/db/queries.ts`: `getBandBySlug`, `getAlbumsByBand`, `getAllBandSlugs` y filtro `bandSlug` en `getRecentStories` y `getPopularStories`. `/api/stories/` acepta `band`.
+- `src/app/bands/[band]/page.tsx` (8 páginas estáticas, `notFound()`, fondo oscuro) con `BandInfo`, `AlbumShelf` (+ `ui/AlbumCover`), dos `StoryGrid` y `PopularBands`, ahora con cada logo enlazado a su banda (también en el home).
+- `src/lib/band-seo.ts`: metadatos, canonical, Open Graph y JSON-LD `BreadcrumbList` y `MusicGroup`.
+- Decisiones: las portadas de álbum son miniaturas de YouTube enlazadas (`youtubevideo.blog` está caído), con recuadro de respaldo cuando el video ya no existe (5 de 32 hoy); `albums.url` conserva los enlaces caídos hasta que se editen en la base.
+
+Verificación final: build sin errores, 8 páginas de banda, `/bands/nirvana/` con ficha y 5 álbumes, 404 para slugs inexistentes, JSON-LD de 2 niveles, Lighthouse Accessibility y SEO 100 y Performance 100 (4 de 5 corridas; una en frío dio 88).
+
+Pendiente:
+
+- Criterio parcial: «VIEW MORE» de Nirvana. Ninguna banda supera las 20 historias (Nirvana tiene 17), así que el botón no aparece; falta decidir si se reescribe el criterio.
+- Elegir el destino de `albums.url` y validar el JSON-LD con schema.org.
+- Commit de la SPEC 03 y merge de las ramas 01, 02 y 03 a `main` (pendiente de tu autorización explícita; cada rama sale de la anterior).
+
+### Fuera de alcance de las SPEC 01, 02 y 03 (para specs futuras)
+
+- Página `/videos/[band]/` y shorts → spec futura. (`/bands/[band]/` ya existe desde la SPEC 03.)
 - Página de filtrado por tag `/tags/[tag]/` (las pills de tags no llevan a ningún sitio), widget de información de banda (país, bandera), botones «VIEW ONLY VIDEO» / «SHORT VIDEO» y pestaña de letra traducida.
 - Compartir en redes (ShareThis) e incremento de `views` por visita.
 - Contenido real de About Us, Notice of Privacy y Contact (hoy son placeholders).
-- `sitemap.xml`, `robots.txt`, feed RSS → **SPEC 03**.
+- `sitemap.xml`, `robots.txt`, feed RSS → spec posterior (la SPEC 03 pasó a ser la página de banda).
 - AdSense, GTM, Meta Pixel, Trustpilot, Google Translate.
 - Rutas en español (`/leer/`, `/banda/`).
 - Panel de administración (reemplazo de `/plataforma/`).
