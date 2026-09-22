@@ -54,8 +54,8 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
-            { label: story.band.name, href: `/bands/${story.band.slug}/` },
-            { label: story.title },
+            { label: story.band.name, href: `/bands/${story.band.slug}/`, noTranslate: true },
+            { label: story.title, noTranslate: true },
           ]}
         />
         <StoryHero story={story} />

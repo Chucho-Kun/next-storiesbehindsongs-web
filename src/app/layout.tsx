@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Footer } from "@/shared/layout/Footer";
 import { Header } from "@/shared/layout/Header";
+import { LanguageSwitcher } from "@/shared/ui/LanguageSwitcher";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Header />
         <div className="flex-1">{children}</div>
         <Footer />
+        <LanguageSwitcher />
       </body>
     </html>
   );

@@ -22,7 +22,10 @@ export function AlbumShelf({ albums }: { albums: BandAlbum[] }) {
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg bg-neutral-900">
                   <AlbumCover src={album.coverPath} name={album.name} />
                 </div>
-                <p className="mt-2 text-center text-sm font-bold group-hover:underline">
+                <p
+                  translate="no"
+                  className="notranslate mt-2 text-center text-sm font-bold group-hover:underline"
+                >
                   {album.name}
                 </p>
                 <p className="text-center text-sm text-muted">{year}</p>

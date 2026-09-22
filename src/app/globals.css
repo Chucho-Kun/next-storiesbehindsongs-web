@@ -21,3 +21,21 @@ body {
   color: var(--fg);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Neutraliza lo que inyecta el widget de Google Translate (SPEC 06). */
+body {
+  top: 0 !important;
+}
+
+iframe.skiptranslate,
+.goog-te-banner-frame,
+#goog-gt-tt,
+.goog-tooltip,
+.goog-tooltip:hover {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}

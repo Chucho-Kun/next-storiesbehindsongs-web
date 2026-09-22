@@ -16,12 +16,13 @@ export function BandInfo({ band }: { band: BandDetail }) {
             fill
             sizes="192px"
             priority
-            className="object-contain p-3"
+            translate="no"
+            className="notranslate object-contain p-3"
           />
         </div>
 
         <div className="min-w-0 space-y-4">
-          <h1 className="text-3xl font-bold text-title sm:text-4xl">{band.name}</h1>
+          <h1 translate="no" className="notranslate text-3xl font-bold text-title sm:text-4xl">{band.name}</h1>
 
           <ul className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
             {band.location && (

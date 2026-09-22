@@ -15,7 +15,10 @@ export function AlbumCover({ src, name }: { src: string; name: string }) {
 
   if (failed) {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-neutral-800 p-3 text-center text-sm font-semibold text-neutral-300">
+      <div
+        translate="no"
+        className="notranslate flex h-full w-full items-center justify-center bg-neutral-800 p-3 text-center text-sm font-semibold text-neutral-300"
+      >
         {name}
       </div>
     );
@@ -32,7 +35,8 @@ export function AlbumCover({ src, name }: { src: string; name: string }) {
       onLoad={(event) => {
         if (event.currentTarget.naturalWidth <= PLACEHOLDER_MAX_WIDTH) setFailed(true);
       }}
-      className="object-cover"
+      translate="no"
+      className="notranslate object-cover"
     />
   );
 }

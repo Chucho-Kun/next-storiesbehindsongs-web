@@ -19,9 +19,9 @@ export function StoryHero({ story }: { story: StoryDetail }) {
   return (
     <section className="space-y-4">
       <div className="bg-white p-4 sm:p-6">
-        <h1 className="text-3xl font-bold text-title sm:text-4xl">{story.title}</h1>
+        <h1 translate="no" className="notranslate text-3xl font-bold text-title sm:text-4xl">{story.title}</h1>
         <p className="mt-1 text-lg font-semibold">
-          <Link href={bandHref} className="hover:underline">
+          <Link href={bandHref} translate="no" className="notranslate hover:underline">
             {story.band.name}
           </Link>
         </p>
@@ -44,10 +44,13 @@ export function StoryHero({ story }: { story: StoryDetail }) {
               alt={`${story.band.name} logo`}
               width={120}
               height={60}
-              className="h-14 w-auto object-contain"
+              translate="no"
+              className="notranslate h-14 w-auto object-contain"
             />
           </Link>
-          <p className="italic text-neutral-500">{story.album}</p>
+          <p translate="no" className="notranslate italic text-neutral-500">
+            {story.album}
+          </p>
         </div>
       </div>
 

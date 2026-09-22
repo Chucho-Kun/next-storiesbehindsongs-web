@@ -12,9 +12,13 @@ const publishedFormatter = new Intl.DateTimeFormat("en-US", {
 export function VideoHero({ story }: { story: StoryDetail }) {
   return (
     <header className="text-center">
-      <h1 className="text-3xl font-bold text-title sm:text-4xl">{story.title}</h1>
+      <h1 translate="no" className="notranslate text-3xl font-bold text-title sm:text-4xl">{story.title}</h1>
       <h2 className="mt-1 text-lg font-bold">
-        <Link href={`/bands/${story.band.slug}/`} className="hover:underline">
+        <Link
+          href={`/bands/${story.band.slug}/`}
+          translate="no"
+          className="notranslate hover:underline"
+        >
           {story.band.name}
         </Link>
       </h2>

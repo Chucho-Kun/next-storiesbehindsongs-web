@@ -21,7 +21,8 @@ export async function PopularBands() {
                 alt={band.name}
                 fill
                 sizes="128px"
-                className="object-contain"
+                translate="no"
+                className="notranslate object-contain"
               />
             </Link>
           </li>

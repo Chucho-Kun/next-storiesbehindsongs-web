@@ -11,16 +11,22 @@ export function StoryCard({ story }: { story: StoryCardData }) {
           alt={story.title}
           fill
           sizes="(min-width: 1024px) 20vw, (min-width: 640px) 33vw, 50vw"
-          className="object-cover"
+          translate="no"
+          className="notranslate object-cover"
         />
-        <span className="absolute right-2 top-2 bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
+        <span
+          translate="no"
+          className="notranslate absolute right-2 top-2 bg-black px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white"
+        >
           {story.band.name}
         </span>
       </div>
       <div className="space-y-1 p-3">
-        <h3 className="text-lg font-bold text-title">{story.title}</h3>
+        <h3 translate="no" className="notranslate text-lg font-bold text-title">{story.title}</h3>
         <div className="flex items-center justify-between gap-2">
-          <p className="italic text-neutral-500">{story.album}</p>
+          <p translate="no" className="notranslate italic text-neutral-500">
+            {story.album}
+          </p>
           <span className="flex shrink-0 items-center gap-1 text-sm text-neutral-500">
             {story.views}
             <img src="/brand/eye.svg" alt="" className="h-3.5 w-3.5" />
