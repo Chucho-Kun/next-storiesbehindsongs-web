@@ -6,7 +6,7 @@ export function AlbumShelf({ albums }: { albums: BandAlbum[] }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-8">
-      <h2 className="mb-4 text-2xl font-bold text-title">Listen Full Album</h2>
+      <h2 className="mb-4 text-2xl font-bold text-neutral-900">Listen Full Album</h2>
       <ul className="flex snap-x gap-4 overflow-x-auto pb-4">
         {albums.map((album) => {
           const year = album.releaseDate.slice(0, 4);

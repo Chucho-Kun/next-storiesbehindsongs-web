@@ -50,7 +50,7 @@ export function BandInfo({ band }: { band: BandDetail }) {
           </ul>
 
           {paragraphs.length > 0 && (
-            <div className="space-y-4 leading-relaxed text-neutral-200">
+            <div className="space-y-4 leading-relaxed text-neutral-700">
               {paragraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}

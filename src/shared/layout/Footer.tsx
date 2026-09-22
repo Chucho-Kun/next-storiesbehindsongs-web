@@ -24,11 +24,11 @@ const SOCIAL_LINKS = [
 
 export function Footer() {
   return (
-    <footer className="bg-background text-foreground">
+    <footer className="bg-black text-white">
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-start sm:justify-between sm:px-8">
         <nav aria-label="Footer" className="flex flex-col gap-2 text-sm">
           {FOOTER_LINKS.map((link) => (
-            <Link key={link.href} href={link.href} className="text-muted hover:text-foreground">
+            <Link key={link.href} href={link.href} className="text-neutral-400 hover:text-white">
               {link.label}
             </Link>
           ))}
@@ -42,7 +42,7 @@ export function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
-              className="text-muted hover:text-foreground"
+              className="text-neutral-400 hover:text-white"
             >
               <Icon className="h-5 w-5" />
             </a>

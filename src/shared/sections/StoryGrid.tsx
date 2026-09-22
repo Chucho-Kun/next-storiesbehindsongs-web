@@ -35,7 +35,7 @@ export function StoryGrid({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10 sm:px-8">
-      <h2 className="mb-4 text-2xl font-bold text-title">{title}</h2>
+      <h2 className="mb-4 text-2xl font-bold text-neutral-900">{title}</h2>
       {stories.length === 0 ? (
         <p className="text-muted">{emptyMessage ?? "No results found."}</p>
       ) : (

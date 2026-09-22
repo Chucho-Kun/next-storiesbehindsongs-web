@@ -54,7 +54,6 @@ export default async function TagPage({ params }: { params: Promise<Params> }) {
       ))}
       <div className="mx-auto max-w-6xl px-4 pt-8 sm:px-8">
         <Breadcrumb
-          variant="dark"
           items={[{ label: "Home", href: "/" }, { label: "Tags", href: "/tags/" }, { label: tag.name }]}
         />
         <h1 className="mt-6 text-3xl font-bold capitalize text-title sm:text-4xl">{tag.name}</h1>

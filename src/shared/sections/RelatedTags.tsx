@@ -9,11 +9,11 @@ export async function RelatedTags({ tagSlug }: { tagSlug: string }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
-      <h2 className="mb-4 text-2xl font-bold text-title">Related Tags</h2>
+      <h2 className="mb-4 text-2xl font-bold text-neutral-900">Related Tags</h2>
       <ul className="flex flex-wrap gap-2">
         {related.map((tag) => (
           <li key={tag.slug}>
-            <TagPill tag={tag} count={tag.sharedCount} />
+            <TagPill tag={tag} count={tag.sharedCount} variant="light" />
           </li>
         ))}
       </ul>
