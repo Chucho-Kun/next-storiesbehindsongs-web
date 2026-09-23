@@ -9,8 +9,7 @@ import {
   buildStoryMetadata,
   jsonLdString,
 } from "@/lib/story-seo";
-import { MostPopularStories } from "@/shared/sections/MostPopularStories";
-import { RelatedSongs } from "@/shared/sections/RelatedSongs";
+import { PopularStoriesSidebar } from "@/shared/sections/PopularStoriesSidebar";
 import { StoryBody } from "@/shared/sections/StoryBody";
 import { StoryFaq } from "@/shared/sections/StoryFaq";
 import { StoryHero } from "@/shared/sections/StoryHero";
@@ -50,7 +49,7 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
           dangerouslySetInnerHTML={{ __html: jsonLdString(data) }}
         />
       ))}
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-4 sm:px-8">
+      <div className="mx-auto max-w-6xl px-4 py-4 sm:px-8">
         <Breadcrumb
           items={[
             { label: "Home", href: "/" },
@@ -58,13 +57,18 @@ export default async function StoryPage({ params }: { params: Promise<Params> })
             { label: story.title, noTranslate: true },
           ]}
         />
-        <StoryHero story={story} />
-        <YoutubeBanner />
-        <StoryBody html={story.bodyHtml} />
-        <StoryLyrics lyrics={story.lyrics} />
-        <StoryFaq story={story} />
-        <MostPopularStories excludeId={story.id} />
-        <RelatedSongs storyId={story.id} tagSlugs={story.tags.map((tag) => tag.slug)} />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+          <div className="flex flex-col gap-6 md:col-span-2">
+            <StoryHero story={story} />
+            <YoutubeBanner />
+            <StoryBody html={story.bodyHtml} />
+            <StoryLyrics lyrics={story.lyrics} />
+            <StoryFaq story={story} />
+          </div>
+          <div>
+            <PopularStoriesSidebar excludeId={story.id} />
+          </div>
+        </div>
       </div>
     </div>
   );
